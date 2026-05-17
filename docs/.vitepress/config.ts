@@ -8,8 +8,16 @@ export default defineConfig({
   cleanUrls: false,
   themeConfig: {
     nav: [
-      { text: 'Home', link: '/' }
+      { text: 'Home', link: '/' },
+      { text: 'Python', link: '/python/01-hello-world' }
     ],
-    sidebar: []
+    sidebar: [
+      {
+        text: 'Python',
+        items: [
+          { text: '01. Hello World', link: '/python/01-hello-world' }
+        ]
+      }
+    ]
   }
 })

@@ -1,619 +1,577 @@
 # research.md
 
 작성일: 2026-05-18 KST  
-범위: VitePress, GitHub Pages Actions 배포, GitHub Codespaces용 devcontainer, Codespaces 배지  
-프로젝트 기준: Python & C 디지털 교재 v1.0. 콘텐츠 운영이 본체이고, 웹사이트는 GitHub Pages에 올리는 VitePress 교재 전달 도구로만 유지한다.
+주제: Day 2 Python 첫 단원 `01-hello-world` 콘텐츠 리서치  
+범위: `print()` 함수, 문자열, 따옴표, 줄바꿈, 한국어 출력, 초보자 오류, 예시/자가진단/미니 과제  
+상태: Research 단계. 아직 plan이나 단원 본문은 만들지 않음.
 
-## 0. AGENTS.md 정독 후 작업 기준
+## 0. AGENTS.md 재확인
 
-이 프로젝트는 새 앱 개발이 아니라 교육 콘텐츠 운영 프로젝트다. v1.0에서 확정된 선택은 VitePress, GitHub Pages, GitHub Codespaces, `.devcontainer/devcontainer.json`, Markdown 콘텐츠이며, 인증, DB, 사이트 내 코드 실행기, 자동 채점, 대시보드, 진도 시스템, AI 튜터 등은 만들지 않는다.
+이 프로젝트는 교육 콘텐츠 운영 프로젝트다. Day 2부터는 단원 콘텐츠가 본체이므로 기능 개발보다 학생이 실제로 막히지 않는 설명과 실습 지시가 중요하다.
 
-이번 요청은 Research 단계이므로 `research.md`만 작성한다. 이후 사용자가 명시적으로 구현을 요청하기 전까지 `package.json`, `docs/`, `.github/workflows/deploy.yml`, `.devcontainer/devcontainer.json` 등 실제 구현 파일은 만들지 않는다.
+단원 작성 시 반드시 지켜야 할 구조:
 
-## 1. VitePress 최신 설치/초기화 방법
+```markdown
+# [번호] [제목]
 
-### 1.1 공식 전제 조건
-
-VitePress 공식 Getting Started 기준으로 현재 요구 사항은 다음과 같다.
-
-- Node.js: 20 이상
-- 터미널
-- Markdown 편집기
-- VS Code와 Vue 공식 확장은 권장 사항
-
-출처:
-- VitePress Getting Started: https://vitepress.dev/guide/getting-started.html
-
-### 1.2 설치 명령
-
-공식 문서는 2026년 현재 설치 예시로 `vitepress@next`를 사용한다. npm 기준:
-
-```bash
-npm add -D vitepress@next
+## 이걸 왜 배우나
+## 핵심 개념
+## 예시 1 / 2 / 3
+## 흔한 실수
+## 자가진단
+## 직접 풀어보기
+## 참고 자료
 ```
 
-다른 패키지 매니저 공식 예시는 다음 계열이다.
+학생 경험 원칙:
 
-```bash
-pnpm add -D vitepress@next
-yarn add -D vitepress@next vue
-bun add -D vitepress@next
-```
+- 정확한 폴더 경로를 쓴다: `cd exercises/python/01-hello-world`
+- 파일명을 직접 말한다: 예, `hello.py` 파일을 연다.
+- 실행 명령어를 정확히 쓴다: `python3 hello.py`
+- 예상 출력을 정확히 쓴다.
+- "코드를 작성해 보세요" 같은 모호한 지시만 두지 않는다.
 
-이 프로젝트 v1.0에서는 단순성을 위해 npm을 기본으로 보는 것이 가장 낫다. 학생에게 추가 패키지 매니저를 설명할 필요가 없고, GitHub Actions에서도 `npm ci` 흐름이 가장 직관적이다.
+저작권 원칙:
 
-### 1.3 ESM 주의사항
+- 외부 책/사이트 단락을 그대로 복사하지 않는다.
+- 코드 예시는 직접 만든다.
+- 백준 등 외부 문제는 링크만 둔다. 문제 본문은 복사하지 않는다.
+- 단원 끝에는 참고 자료 출처를 명시한다.
 
-VitePress는 ESM-only 패키지다. 따라서 구현 시 `package.json`에 아래 설정을 넣는 편이 안전하다.
+## 1. 참고 자료와 활용 방식
 
-```json
-{
-  "type": "module"
-}
-```
+이번 리서치는 지정 자료와 공식 문서를 함께 참고했다. 본문 작성 때는 문장을 복사하지 않고, 아래 자료에서 확인한 개념을 본 프로젝트 학생 수준에 맞게 다시 설명한다.
 
-대안은 `.vitepress/config.js` 대신 `.mjs` 또는 `.mts`를 쓰는 방식이지만, 이 프로젝트의 확정 구조가 `docs/.vitepress/config.ts`이므로 TypeScript config와 `"type": "module"` 조합이 자연스럽다.
-
-### 1.4 초기화 마법사
-
-설치 후 공식 초기화 명령:
-
-```bash
-npx vitepress init
-```
-
-이 프로젝트에 맞는 응답값:
-
-| 질문 | 응답 |
-|---|---|
-| Where should VitePress initialize the config? | `./docs` |
-| Where should VitePress look for your markdown files? | `./docs` |
-| Site title | `Python & C 디지털 교재` |
-| Site description | `Python과 C를 처음 배우는 학생을 위한 실습형 디지털 교재` |
-| Theme | `Default Theme` |
-| Use TypeScript for config and theme files? | `Yes` |
-| Add VitePress npm scripts to package.json? | `Yes` |
-| Add a prefix for VitePress npm scripts? | `Yes` |
-| Prefix | `docs` |
-
-초기화 마법사는 예시 파일을 만들 수 있다. 실제 구현 단계에서는 AGENTS.md의 확정 폴더 구조에 맞게 예시 파일을 정리해야 한다. 단, 지금은 구현하지 않는다.
-
-### 1.5 예상 `package.json` 핵심
-
-초기화 후 필요한 핵심 스크립트는 다음 형태다.
-
-```json
-{
-  "type": "module",
-  "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
-  },
-  "devDependencies": {
-    "vitepress": "..."
-  }
-}
-```
-
-공식 문서의 기본 스크립트도 `vitepress dev docs`, `vitepress build docs`, `vitepress preview docs` 형태다.
-
-### 1.6 폴더 구조와 VitePress root
-
-공식 문서는 기존 프로젝트에 VitePress를 넣을 때 `./docs` 같은 하위 디렉터리에 스캐폴딩하는 방식을 권장한다. 이 프로젝트의 확정 구조도 동일하다.
-
-구현 후 목표 구조:
-
-```text
-coding-textbook/
-├── docs/
-│   ├── .vitepress/
-│   │   └── config.ts
-│   ├── index.md
-│   ├── python/
-│   │   ├── 01-hello-world.md
-│   │   └── 02-variables.md
-│   └── c/
-│       └── 01-hello-world.md
-├── exercises/
-├── package.json
-└── README.md
-```
-
-VitePress 관점에서 `docs`가 project root가 된다. 따라서 config 파일은 `<root>/.vitepress/config.[ext]`, 즉 이 프로젝트에서는 `docs/.vitepress/config.ts`에 위치한다.
-
-### 1.7 중요한 VitePress config 키
-
-출처:
-- VitePress Site Config: https://vitepress.dev/reference/site-config
-- VitePress CLI: https://vitepress.dev/reference/cli
-- VitePress Deploy: https://vitepress.dev/guide/deploy
-
-이 프로젝트에 직접 관련되는 키:
-
-| 키 | 타입/기본값 | 의미 | v1.0 판단 |
-|---|---|---|---|
-| `lang` | string, 기본 `en-US` | HTML `lang` 속성 | `ko-KR` |
-| `title` | string | 사이트 제목, 기본 테마 nav에 표시 | `Python & C 디지털 교재` |
-| `description` | string | 메타 설명 | 짧은 교재 설명 |
-| `base` | string, 기본 `/` | 배포 기준 경로 | repo Pages면 `/<REPO>/`, 사용자/조직 Pages면 `/` |
-| `cleanUrls` | boolean, 기본 `false` | `.html` 없는 URL 생성 | GitHub Pages 최소 운영에서는 `false` 유지 권장 |
-| `srcDir` | string, 기본 `.` | Markdown source 위치 | `docs` 자체가 root라 별도 설정 불필요 |
-| `srcExclude` | string[] | source에서 제외할 md glob | 필요 시 `**/TODO.md` 정도만 |
-| `outDir` | string, 기본 `./.vitepress/dist` | 빌드 결과물 위치 | 기본값 유지, Actions에서 `docs/.vitepress/dist` 업로드 |
-| `assetsDir` | string, 기본 `assets` | 빌드 asset 하위 폴더 | 기본값 유지 |
-| `cacheDir` | string, 기본 `./.vitepress/cache` | dev/build cache | 기본값 유지, `.gitignore`에 추가 |
-| `themeConfig` | object | 기본 테마 설정 | nav/sidebar는 교재 목차에 맞춰 최소 구성 |
-
-GitHub Pages에서 repository site로 배포하면 보통 URL이 `https://OWNER.github.io/REPO/`가 되므로 `base: '/REPO/'`가 필요하다. repository 이름이 아직 확정되지 않았다면 구현 단계에서 `REPO` 값을 실제 이름으로 바꾸는 결정을 해야 한다.
-
-### 1.8 CLI 옵션
-
-VitePress CLI 공식 기준:
-
-```bash
-vitepress dev [root]
-vitepress build [root]
-vitepress preview [root]
-vitepress init
-```
-
-이 프로젝트 기준:
-
-```bash
-npm run docs:dev      # vitepress dev docs
-npm run docs:build    # vitepress build docs
-npm run docs:preview  # vitepress preview docs
-```
-
-관련 옵션:
-
-| 명령 | 옵션 | 의미 |
+| 자료 | 확인한 내용 | 링크 |
 |---|---|---|
-| `vitepress dev` | `--open [path]` | 시작 시 브라우저 열기 |
-| `vitepress dev` | `--port <port>` | 개발 서버 포트 지정 |
-| `vitepress dev` | `--base <path>` | 임시 base path 지정 |
-| `vitepress dev` | `--strictPort` | 포트 사용 중이면 실패 |
-| `vitepress dev` | `--force` | optimizer cache 무시 |
-| `vitepress build` | `--base <path>` | 빌드 시 base override |
-| `vitepress build` | `--outDir <dir>` | 출력 폴더 override |
-| `vitepress preview` | `--port <port>` | preview 포트 지정 |
+| Python 공식 `print()` 문서 | 함수 시그니처, `sep`, `end`, `file`, `flush`, 기본 줄바꿈 | https://docs.python.org/3/library/functions.html#print |
+| Python 공식 표현식 reference: Calls | 함수 호출 문법, callable, 인자 평가 | https://docs.python.org/3/reference/expressions.html#calls |
+| Python 공식 tutorial 1장 | 문자열 표현, `\n`, `print()`가 escape 문자를 해석해 보이게 하는 방식 | https://docs.python.org/3/tutorial/introduction.html |
+| Python 공식 `str` 문서 | 문자열은 Unicode code point sequence, 작은/큰/삼중 따옴표 | https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str |
+| Python Unicode HOWTO | Python 3 `str`의 Unicode 성격, source 기본 UTF-8 | https://docs.python.org/3/howto/unicode.html |
+| CS50 Python Lecture 0 | 첫 프로그램, 함수/인자 설명, missing parenthesis를 bug로 다루는 방식, `end='\n'` | https://cs50.harvard.edu/python/notes/0/ |
+| Real Python print guide | `print()`를 실제 출력 제어 도구로 설명하는 방식, `sep`/`end` 응용 | https://realpython.com/python-print/ |
+| 점프 투 파이썬: 사용자 입출력 | `print` 상세, 쉼표 출력, `sep`, `end` | https://wikidocs.net/25 |
+| WikiDocs Python 표준 출력 | 따옴표 안 따옴표, escape, Unicode 문자열 설명 | https://wikidocs.net/20403 |
+| Stack Overflow / Reddit 사례 | `print` 괄호 누락, `Print` 대문자, 따옴표 누락/미종료, 초보자의 실제 질문 패턴 | 예: https://stackoverflow.com/questions/25445439/what-does-syntaxerror-missing-parentheses-in-call-to-print-mean-in-python |
+| Baekjoon 문제 링크 | 입문 출력 과제 매핑. 문제 본문은 복사하지 않음 | https://www.acmicpc.net/problem/2557 등 |
 
-v1.0에서는 config 중심으로 고정하고 CLI override는 최소화한다. 개발 서버 포트만 필요하면 나중에 `vitepress dev docs --host 0.0.0.0`이 필요한지 Codespaces에서 확인한다. VitePress 공식 CLI 표에는 `--host`가 보이지 않지만, Vite 기반 서버에서 자주 필요한 설정이므로 구현 전 실제 동작 확인이 필요하다.
+로컬 검증 메모:
 
-## 2. GitHub Pages 자동 배포
+- 현재 Windows 환경의 `python`/`python3`는 실제 Python interpreter가 아니라 Microsoft Store stub로 보인다.
+- 따라서 에러 메시지 실행 검증은 로컬에서 완료하지 못했다.
+- 아래 에러 문구는 Python 공식 문서, Stack Overflow/Reddit 사례, 현대 CPython에서 널리 보이는 문구를 기준으로 정리한다.
+- Python minor version에 따라 caret 위치나 부가 제안 문구는 조금 달라질 수 있다. 단원 본문에서는 "핵심 문구"를 중심으로 설명한다.
 
-### 2.1 배포 방식 선택
+## 2. 첫 단원에서 반드시 다룰 핵심 개념
 
-GitHub Pages는 branch/folder에서 바로 publish하거나 GitHub Actions workflow로 publish할 수 있다. VitePress는 빌드 과정이 필요하므로 이 프로젝트는 GitHub Actions workflow 방식이 맞다.
+### 2.1 `print()`는 "화면에 보여 달라"는 함수 호출이다
 
-GitHub 저장소 설정에서 필요한 선택:
+첫 단원에서 학생에게 가장 먼저 심어야 할 그림:
 
-```text
-Settings → Pages → Build and deployment → Source → GitHub Actions
+```python
+print("Hello, Python!")
 ```
 
-출처:
-- GitHub Pages publishing source: https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
-- GitHub Pages custom workflows: https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+이 한 줄은 세 조각으로 나누어 설명한다.
 
-### 2.2 Actions 흐름
+| 조각 | 초보자용 설명 |
+|---|---|
+| `print` | Python이 이미 알고 있는 이름이다. 화면에 값을 보여 주는 일을 한다. |
+| `(...)` | 함수를 실행시키는 표시다. 괄호 안에는 함수에게 건네줄 값을 넣는다. |
+| `"Hello, Python!"` | 화면에 보여 줄 글자 데이터다. 이런 글자 데이터를 문자열이라고 부른다. |
 
-GitHub Docs가 설명하는 custom workflow의 일반 흐름:
+공식 문서상 `print()`의 전체 형태는 다음 계열이다.
 
-1. default branch push 또는 manual dispatch로 workflow 시작
-2. `actions/checkout`으로 repository checkout
-3. 필요한 경우 static site build
-4. `actions/upload-pages-artifact`로 정적 파일 artifact 업로드
-5. push가 default branch에서 발생했다면 `actions/deploy-pages`로 배포
-
-VitePress 공식 배포 문서도 `.github/workflows/deploy.yml` 생성, `docs/.vitepress/dist` 업로드, Pages source를 GitHub Actions로 설정하는 흐름을 제시한다.
-
-### 2.3 2026년 기준 action 버전 조사
-
-공식 문서와 action 저장소가 완전히 같은 속도로 갱신되지는 않는다. 현재 조사 기준으로 정리하면 다음과 같다.
-
-| action | GitHub Pages docs 예시 | action 저장소/공식 repo 확인 | 판단 |
-|---|---:|---:|---|
-| `actions/checkout` | `@v6` | `@v6` 최신으로 표시 | `@v6` 사용 가능 |
-| `actions/setup-node` | 별도 Pages 문서에는 없음 | `@v6`, Node 24 예시 | `@v6` 사용 |
-| `actions/configure-pages` | `@v5` | `@v5` latest | `@v5` 사용 |
-| `actions/upload-pages-artifact` | `@v4` | 저장소에는 `v5.0.0 Latest Apr 10, 2026` 표시 | 구현 시 `@v4` 보수 선택 또는 `@v5` 최신 선택 결정 필요 |
-| `actions/deploy-pages` | `@v4` | `@v4` | `@v4` 사용 |
-
-주의할 점:
-
-- VitePress 공식 deploy 문서 예시는 일부 action을 `configure-pages@v4`, `upload-pages-artifact@v3`로 보여준다. GitHub Pages 공식 custom workflow 문서가 더 최신이므로 deploy workflow 작성 시 GitHub Pages 문서를 우선한다.
-- `upload-pages-artifact`는 GitHub Pages docs가 `@v4`를 예시로 들지만, 저장소 최신 릴리스는 `v5.0.0`으로 표시된다. 안정성을 우선하면 docs와 맞는 `@v4`, 최신성을 엄격히 우선하면 `@v5`다. v1.0 교재 프로젝트에서는 예측 가능성이 더 중요하므로 구현 계획에서 보수 선택을 명시하는 편이 좋다.
-
-출처:
-- GitHub custom workflows: https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
-- actions/upload-pages-artifact: https://github.com/actions/upload-pages-artifact
-- actions/deploy-pages: https://github.com/actions/deploy-pages
-- actions/setup-node: https://github.com/actions/setup-node
-- actions/checkout: https://github.com/actions/checkout
-
-### 2.4 권장 `deploy.yml` 구조
-
-구현 단계의 기준 형태:
-
-```yaml
-name: Deploy VitePress site to Pages
-
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build with VitePress
-        run: npm run docs:build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: docs/.vitepress/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+```python
+print(*objects, sep=' ', end='\n', file=None, flush=False)
 ```
 
-`upload-pages-artifact@v4`는 GitHub Pages 문서 기준 보수 선택이다. 최신 태그만 기준으로 하면 `@v5` 후보도 존재한다.
+하지만 첫 단원에서 전부 가르치면 과하다. Day 2 첫 단원에서는 다음 정도만 노출한다.
 
-### 2.5 권한과 environment
+1. `print("문장")`: 문자열 한 개 출력
+2. `print("A")`, `print("B")`: 호출 한 번마다 기본적으로 줄이 바뀜
+3. `print("A", "B")`: 쉼표로 여러 값을 넣으면 기본 공백으로 이어서 출력
+4. `print("A", "B", sep="-")`: 살짝 응용용. 구분자를 바꿀 수 있다는 맛보기
+5. `print("A", end="")`: 선택적 맛보기. 줄바꿈을 바꿀 수 있다는 정도
 
-`deploy-pages`에 필요한 최소 권한:
+첫 단원에서 `file`, `flush`는 다루지 않는다. 필요성이 아직 없다.
 
-```yaml
-permissions:
-  pages: write
-  id-token: write
+### 2.2 괄호의 의미: "실행"과 "전달"
+
+초보자는 괄호를 수학의 묶음 기호로만 알고 오는 경우가 많다. `print()`에서는 괄호가 함수 호출의 핵심이다.
+
+가르칠 표현:
+
+- `print`만 쓰면 "함수의 이름"을 말한 것이다.
+- `print()`라고 써야 함수를 실행한다.
+- 괄호 안에는 함수에게 줄 재료를 넣는다.
+- `print("안녕")`은 `print`에게 문자열 `"안녕"`을 전달하고 실행한다는 뜻이다.
+
+비유:
+
+- `print` = 버튼 이름
+- `()` = 버튼을 누르는 행동
+- `"안녕"` = 버튼을 누르며 함께 넣는 종이 쪽지
+
+주의:
+
+- `print "안녕"`은 Python 3에서 안 된다.
+- Python 2 시절의 오래된 예제를 복사하면 이 실수가 자주 나온다.
+
+### 2.3 문자열: 따옴표로 감싼 글자 데이터
+
+첫 단원에서 문자열은 "컴퓨터에게 이것은 명령어가 아니라 글자 그대로의 내용이라고 알려 주는 방법"으로 설명한다.
+
+```python
+print("안녕하세요")
+print('안녕하세요')
 ```
 
-전체 workflow에서는 checkout과 build까지 고려해 다음이 일반적이다.
+작은따옴표와 큰따옴표는 첫 단계에서는 같은 역할로 봐도 된다.
 
-```yaml
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-```
+선택 기준:
 
-배포 job에는 environment를 둔다.
-
-```yaml
-environment:
-  name: github-pages
-  url: ${{ steps.deployment.outputs.page_url }}
-```
-
-`github-pages` environment는 GitHub Pages workflow template에서 기본적으로 쓰는 이름이다.
-
-### 2.6 artifact 조건
-
-GitHub Pages artifact는 정적 파일 폴더를 압축해 배포한다. `actions/upload-pages-artifact`를 쓰면 형식을 맞춰준다.
-
-중요 조건:
-
-- artifact 이름 기본값: `github-pages`
-- `path` 기본값은 `_site/`이므로 VitePress에서는 반드시 `docs/.vitepress/dist`로 지정
-- artifact 내부 tar는 hard link나 symbolic link를 포함하면 안 됨
-- Pages 공식 지원 크기는 1GB 수준으로 보는 것이 안전
-- action repo 기준 `include-hidden-files` 기본값은 `false`; `.git`, `.github`는 어차피 제외
-
-이 프로젝트는 교재 정적 사이트라 artifact 크기 문제는 거의 없지만, 큰 이미지나 동영상 파일을 repo에 넣지 않는 원칙은 유지해야 한다.
-
-### 2.7 VitePress `base`와 GitHub Pages URL
-
-GitHub Pages repository site:
-
-```text
-https://OWNER.github.io/REPO/
-```
-
-VitePress config:
-
-```ts
-export default {
-  base: '/REPO/'
-}
-```
-
-사용자/조직 site:
-
-```text
-https://OWNER.github.io/
-```
-
-VitePress config:
-
-```ts
-export default {
-  base: '/'
-}
-```
-
-custom domain을 쓰는 경우도 보통 `/`다. v1.0은 무료 운영 원칙상 custom domain을 전제로 하지 않는다.
-
-### 2.8 `npm ci` 주의사항
-
-CI에서 `npm ci`를 쓰려면 `package-lock.json`이 있어야 한다. 구현 단계에서 VitePress 설치 후 lockfile을 commit해야 Actions가 안정적으로 동작한다.
-
-## 3. `.devcontainer/devcontainer.json` 최소 설정
-
-### 3.1 위치와 형식
-
-GitHub Codespaces와 Dev Container Spec은 다음 위치를 인식한다.
-
-우선순위:
-
-1. `.devcontainer/devcontainer.json`
-2. `.devcontainer.json`
-3. `.devcontainer/<folder>/devcontainer.json`
-
-이 프로젝트 확정 구조는 `.devcontainer/devcontainer.json`이다. 파일 형식은 JSONC라서 주석을 쓸 수 있지만, 학생용 교재 repo에서는 주석도 최소화하는 편이 낫다.
-
-출처:
-- GitHub Codespaces dev container intro: https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/adding-a-dev-container-configuration/introduction-to-dev-containers
-- Dev Container Spec reference: https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainer-reference.md
-- Dev Container metadata reference: https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainerjson-reference.md
-
-### 3.2 image 필드 생략 전략
-
-AGENTS.md 결정사항: `.devcontainer/devcontainer.json`의 `image` 필드는 처음에 생략 시도.
-
-GitHub Codespaces 문서에 따르면 repository에 devcontainer 설정이 없거나 base image를 지정하지 않으면 GitHub가 default Linux image를 사용한다. 이 default image에는 Python, Node, PHP, Java, Go, C++, Ruby, .NET 계열 런타임과 Git, GitHub CLI, yarn, openssh, vim 등이 포함된다.
-
-따라서 v1.0 최소 전략:
-
-- `image` 생략
-- Dockerfile 생략
-- Docker Compose 생략
-- 필요한 공통 편집기 확장과 포트 정보만 devcontainer에 둠
-- 첫 Codespaces 생성 후 `python3`, `node`, `npm`, `gcc` 확인
-
-확인 명령:
-
-```bash
-python3 --version
-node --version
-npm --version
-gcc --version
-```
-
-만약 `gcc`가 없거나 버전 문제가 있으면 그때 plan.md에서 `image` 추가 또는 feature 추가를 검토한다. 현재 Research 단계에서는 추가하지 않는다.
-
-### 3.3 devcontainer 핵심 키
-
-Dev Container metadata reference 기준 주요 키:
-
-| 키 | 타입 | 의미 | 이 프로젝트 판단 |
-|---|---|---|---|
-| `name` | string | UI에 표시될 dev container 이름 | 사용 |
-| `image` | string | registry image 직접 사용 | 처음에는 생략 |
-| `build.dockerfile` | string | Dockerfile 기반 build | 생략 |
-| `features` | object | Feature ID와 옵션 | 처음에는 생략 가능, 필요 시 Node/C toolchain 고정에 사용 |
-| `customizations` | object | VS Code 등 도구별 설정 | 사용 가능 |
-| `customizations.vscode.extensions` | string[] | Codespaces VS Code 확장 | Python/C/Markdown 중심 최소 |
-| `forwardPorts` | array | 항상 forwarding할 포트 | VitePress dev server용 5173 후보 |
-| `portsAttributes` | object | 포트 label, 자동 open 방식 | 5173 label 지정 후보 |
-| `postCreateCommand` | string/array/object | container 생성 후 1회 실행 | package 생성 후 `npm install` 후보 |
-| `postStartCommand` | string/array/object | container 시작마다 실행 | dev server 자동 시작은 피함 |
-| `postAttachCommand` | string/array/object | editor attach 후 실행 | 불필요 |
-| `remoteUser` | string | tool/lifecycle command 실행 사용자 | 기본값 유지 |
-| `containerEnv` | object | container 전체 환경변수 | 불필요 |
-| `remoteEnv` | object | editor/terminal 등 remote process env | 불필요 |
-| `hostRequirements` | object | CPU/RAM/storage minimum | 무료 사용량 고려해 처음에는 생략 |
-
-### 3.4 최소 devcontainer 후보
-
-구현 단계 후보:
-
-```jsonc
-{
-  "name": "Python & C Textbook",
-  "forwardPorts": [5173],
-  "portsAttributes": {
-    "5173": {
-      "label": "VitePress",
-      "onAutoForward": "openPreview"
-    }
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-python.python",
-        "ms-vscode.cpptools",
-        "bierner.markdown-mermaid"
-      ]
-    }
-  }
-}
-```
-
-검토:
-
-- `image` 없음: AGENTS.md 결정과 일치
-- `postCreateCommand` 없음: `package.json`이 생긴 뒤에 넣는 편이 안전
-- `forwardPorts` 5173: Vite/VitePress 기본 개발 서버 포트
-- 확장: Python, C/C++, Markdown 보조 정도만. 과한 확장 설치는 생성 시간을 늘릴 수 있다.
-
-### 3.5 `postCreateCommand` 사용 시점
-
-`postCreateCommand`는 workspace가 mount된 뒤 container 내부에서 실행된다. package 파일이 생긴 뒤에는 다음 후보가 가능하다.
-
-```jsonc
-{
-  "postCreateCommand": "npm install"
-}
-```
-
-단, 다음은 피한다.
-
-```jsonc
-{
-  "postCreateCommand": "npm run docs:dev"
-}
-```
-
-이유:
-
-- lifecycle command는 종료되어야 container 준비가 정상적으로 끝난다.
-- dev server는 학생이 단원 실습 때 직접 실행하거나, 문서에 명령어로 안내하는 편이 교육적으로 명확하다.
-
-### 3.6 string / array / object command 형식
-
-Dev Container lifecycle command는 세 형식이 가능하다.
-
-```jsonc
-{
-  "postCreateCommand": "npm install"
-}
-```
-
-```jsonc
-{
-  "postCreateCommand": ["npm", "install"]
-}
-```
-
-```jsonc
-{
-  "postCreateCommand": {
-    "deps": "npm install",
-    "check-python": "python3 --version"
-  }
-}
-```
-
-string은 shell을 통해 실행되므로 `&&` 같은 shell 문법을 사용할 수 있다. array는 shell 없이 직접 실행된다. object는 같은 lifecycle 단계에서 병렬 실행된다. 이 프로젝트는 단순성을 위해 string 하나가 가장 읽기 쉽다.
-
-## 4. README에 Open in Codespaces 배지 임베드
-
-### 4.1 공식 Markdown 형식
-
-GitHub Codespaces 공식 문서의 badge 형식:
-
-```markdown
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](URL)
-```
-
-이 프로젝트 기본 후보:
-
-```markdown
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/OWNER/REPO?quickstart=1)
-```
-
-출처:
-- Facilitating quick creation and resumption of codespaces: https://docs.github.com/en/enterprise-cloud@latest/codespaces/setting-up-your-project-for-codespaces/setting-up-your-repository/facilitating-quick-creation-and-resumption-of-codespaces
-
-### 4.2 Codespaces deep link 형식
-
-기본 branch:
-
-```text
-https://codespaces.new/OWNER/REPO
-```
-
-특정 branch:
-
-```text
-https://codespaces.new/OWNER/REPO/tree/BRANCH-NAME
-```
-
-PR topic branch:
-
-```text
-https://codespaces.new/OWNER/REPO/pull/PR-SHA
-```
-
-최근 codespace 재개 우선:
-
-```text
-https://codespaces.new/OWNER/REPO?quickstart=1
-```
-
-이미 query string이 있으면:
-
-```text
-https://codespaces.new/OWNER/REPO?param=value&quickstart=1
-```
-
-`quickstart=1`은 학생이 이미 만든 codespace가 있으면 재개 화면으로 보내고, 없으면 새 codespace 생성 화면으로 보낸다. README와 각 단원의 "직접 풀어보기" 버튼에는 이 옵션이 가장 학생 친화적이다.
-
-### 4.3 GitHub UI에서 badge 생성
-
-GitHub 문서는 repository의 Code 버튼 → Codespaces tab → Share a deep link 메뉴에서 URL, Markdown snippet, HTML snippet을 만들 수 있다고 설명한다. 이 방법은 다음 옵션을 UI로 고를 수 있어 실수 방지에 좋다.
-
-- branch
-- dev container configuration file
-- quick start 여부
-- URL / Markdown / HTML snippet 복사
-
-이 프로젝트는 devcontainer를 하나만 둘 예정이므로 손으로 쓰는 Markdown도 충분하지만, 최종 README 작성 전 실제 OWNER/REPO가 확정되면 UI로 한번 확인하는 것이 안전하다.
-
-### 4.4 단원별 배지 사용
-
-AGENTS.md의 단원 표준 구조상 각 단원 `직접 풀어보기` 섹션에도 Codespaces 배지가 들어간다.
-
-단원에서는 badge 아래에 반드시 다음을 붙인다.
-
-````markdown
-Codespaces가 열리면 아래 폴더로 이동하세요:
-
-```bash
-cd exercises/python/01-hello-world
-```
-````
-
-그리고 각 문제마다 다음을 명시한다.
-
-- 파일명
-- 실행 명령어
-- 예상 출력
+- 문장 안에 작은따옴표가 있으면 바깥은 큰따옴표를 쓴다.
+- 문장 안에 큰따옴표가 있으면 바깥은 작은따옴표를 쓴다.
+- 바깥 따옴표와 같은 따옴표를 안에 넣고 싶으면 `\"` 또는 `\'`처럼 escape를 쓴다.
 
 예:
 
-````markdown
-문제 1: `hello.py` 파일을 열고 아래 명령어로 실행하세요.
+```python
+print("I'm learning Python.")
+print('그가 말했다: "안녕!"')
+print("그가 말했다: \"안녕!\"")
+```
 
-```bash
-python3 hello.py
+초보자에게 중요한 포인트:
+
+- 따옴표는 출력되는 글자의 일부가 아니다. 문자열의 시작과 끝을 표시한다.
+- 따옴표를 열었으면 같은 종류의 따옴표로 닫아야 한다.
+- `“ ”`, `‘ ’` 같은 스마트 따옴표는 Python 코드용 따옴표가 아니다. 웹페이지나 문서에서 복사했을 때 특히 조심한다.
+
+### 2.4 한국어 출력과 인코딩
+
+결론부터:
+
+```python
+print("안녕하세요")
+```
+
+Python 3와 GitHub Codespaces 기준에서는 특별한 설정 없이 정상 출력되는 것으로 가르쳐도 된다.
+
+이유:
+
+- Python 3의 `str`은 Unicode 문자를 담는다.
+- Python source code의 기본 encoding은 UTF-8이다.
+- Codespaces의 Linux terminal/VS Code 환경은 UTF-8을 기본으로 다루는 흐름이어서 한국어 출력이 자연스럽다.
+
+초보자에게는 이렇게 설명한다.
+
+> Python 3에서는 한국어도 문자열 안에 그냥 쓸 수 있다. 우리가 쓰는 Codespaces 환경에서는 `print("안녕하세요")`가 그대로 출력된다.
+
+단, 교사용 메모:
+
+- 고전 Windows 콘솔, 잘못 저장된 파일 encoding, 특수 emoji 출력에서는 encoding 문제가 날 수 있다.
+- 한국어 자체는 Windows CP949에서도 대체로 표현 가능하지만, emoji나 일부 특수 기호는 `UnicodeEncodeError`가 날 수 있다.
+- 첫 단원에서는 emoji를 필수 과제로 넣지 않는 편이 안전하다.
+- 학생이 한국어가 깨진다고 하면 먼저 Codespaces에서 실행 중인지, 파일이 UTF-8로 저장되는지, 터미널이 VS Code terminal인지 확인한다.
+
+### 2.5 줄바꿈 동작
+
+`print()`는 기본적으로 출력 뒤에 줄바꿈을 붙인다.
+
+```python
+print("첫 줄")
+print("둘째 줄")
+```
+
+예상 출력:
+
+```text
+첫 줄
+둘째 줄
+```
+
+공식 문서의 핵심은 `end='\n'`이다. 초보자에게는 `\n`을 "줄을 바꾸라는 특수 표시"라고 말한다.
+
+두 가지 줄바꿈을 구분해서 가르친다.
+
+1. `print()` 호출이 끝날 때 자동으로 생기는 줄바꿈
+
+```python
+print("A")
+print("B")
+```
+
+출력:
+
+```text
+A
+B
+```
+
+2. 문자열 안에 직접 넣은 `\n`
+
+```python
+print("A\nB")
+```
+
+출력:
+
+```text
+A
+B
+```
+
+첫 단원에서의 설명 순서:
+
+1. 먼저 `print()`가 자동으로 줄을 바꾼다는 사실만 가르친다.
+2. 그 다음 `\n`은 "문자열 안에서 줄바꿈을 넣는 표시"로 맛보기 한다.
+3. `end=""`는 응용 예시 또는 자가진단에서만 살짝 쓴다.
+
+### 2.6 따옴표 안의 따옴표 처리
+
+이 단원에서 반드시 다뤄야 한다. 이유는 Hello World 다음 단계에서 학생이 곧바로 자기소개, 대사, 인용문을 출력하고 싶어 하기 때문이다.
+
+가르칠 순서:
+
+1. 바깥과 안쪽 따옴표를 다르게 쓴다.
+
+```python
+print('그가 말했다: "Python 좋아!"')
+print("I'm ready.")
+```
+
+2. 같은 따옴표를 꼭 써야 하면 앞에 `\`를 붙인다.
+
+```python
+print("그가 말했다: \"Python 좋아!\"")
+print('I\'m ready.')
+```
+
+3. ASCII art나 경로처럼 backslash 자체를 출력하려면 `\\`가 필요할 수 있다.
+
+```python
+print("\\")
+```
+
+출력:
+
+```text
+\
+```
+
+첫 단원에서는 raw string `r"..."`까지 설명하지 않는다. 단, 백준 10171/10172 같은 ASCII art 문제와 연결할 때 교사용 메모로 남긴다.
+
+## 3. 초보자가 `print()`에서 자주 막히는 지점
+
+### 3.1 Python 2 스타일로 쓰는 경우
+
+잘못된 코드:
+
+```python
+print "Hello"
+```
+
+대표 에러:
+
+```text
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Hello")?
+```
+
+근본 원인:
+
+- Python 3에서는 `print`가 함수다.
+- 함수는 괄호로 호출해야 한다.
+- 오래된 Python 2 예제나 낡은 블로그를 보고 따라 하면 발생한다.
+
+해결:
+
+```python
+print("Hello")
+```
+
+가르칠 문장:
+
+> Python 3에서는 `print` 뒤에 반드시 괄호를 붙인다.
+
+### 3.2 `Print`처럼 대문자로 시작하는 경우
+
+잘못된 코드:
+
+```python
+Print("Hello")
+```
+
+대표 에러:
+
+```text
+NameError: name 'Print' is not defined
+```
+
+Python 버전에 따라 다음처럼 제안이 붙을 수 있다.
+
+```text
+NameError: name 'Print' is not defined. Did you mean: 'print'?
+```
+
+근본 원인:
+
+- Python은 대소문자를 구분한다.
+- `print`와 `Print`는 다른 이름이다.
+- Python이 알고 있는 내장 함수 이름은 소문자 `print`다.
+
+해결:
+
+```python
+print("Hello")
+```
+
+가르칠 문장:
+
+> Python에서는 대문자와 소문자가 다르다. 첫 단원에서는 `print`를 전부 소문자로 쓴다.
+
+### 3.3 문자열에 따옴표를 안 붙이는 경우
+
+잘못된 코드:
+
+```python
+print(Hello)
+```
+
+대표 에러:
+
+```text
+NameError: name 'Hello' is not defined
+```
+
+근본 원인:
+
+- 따옴표 없는 `Hello`는 글자가 아니라 "이름"으로 해석된다.
+- 아직 `Hello`라는 변수나 이름을 만든 적이 없으므로 Python이 찾지 못한다.
+
+해결:
+
+```python
+print("Hello")
+```
+
+가르칠 문장:
+
+> 글자 그대로 출력하고 싶으면 따옴표로 감싼다.
+
+### 3.4 여는 따옴표만 쓰고 닫지 않는 경우
+
+잘못된 코드:
+
+```python
+print("Hello)
+```
+
+대표 에러:
+
+```text
+SyntaxError: unterminated string literal (detected at line 1)
+```
+
+근본 원인:
+
+- Python은 `"`를 보고 문자열이 시작됐다고 생각한다.
+- 줄 끝까지 읽었는데 닫는 `"`를 찾지 못했다.
+
+해결:
+
+```python
+print("Hello")
+```
+
+가르칠 문장:
+
+> 따옴표는 여는 것과 닫는 것이 한 쌍이다.
+
+### 3.5 괄호를 닫지 않는 경우
+
+잘못된 코드:
+
+```python
+print("Hello"
+```
+
+대표 에러:
+
+```text
+SyntaxError: '(' was never closed
+```
+
+Python 버전이나 실행 위치에 따라 `invalid syntax` 계열로 보일 수도 있다.
+
+근본 원인:
+
+- `print(`로 함수 호출을 시작했지만 닫는 `)`가 없다.
+
+해결:
+
+```python
+print("Hello")
+```
+
+가르칠 문장:
+
+> 괄호도 따옴표처럼 열었으면 닫아야 한다.
+
+### 3.6 바깥 따옴표와 안쪽 따옴표가 충돌하는 경우
+
+잘못된 코드:
+
+```python
+print("그가 말했다: "안녕!"")
+```
+
+대표 에러:
+
+```text
+SyntaxError: invalid syntax. Perhaps you forgot a comma?
+```
+
+또는 caret가 안쪽 따옴표 부근을 가리키는 `SyntaxError`가 난다.
+
+근본 원인:
+
+- Python은 두 번째 `"`를 문자열 끝으로 오해한다.
+- 그 뒤의 `안녕!`은 Python 코드로 해석하려다 실패한다.
+
+해결 1: 바깥과 안쪽 따옴표를 다르게 쓴다.
+
+```python
+print('그가 말했다: "안녕!"')
+```
+
+해결 2: 안쪽 따옴표 앞에 `\`를 붙인다.
+
+```python
+print("그가 말했다: \"안녕!\"")
+```
+
+가르칠 문장:
+
+> 문장 안에 따옴표를 넣고 싶으면 바깥 따옴표와 다른 종류를 쓰는 것이 가장 쉽다.
+
+### 3.7 스마트 따옴표를 붙여 넣는 경우
+
+잘못된 코드:
+
+```python
+print(“Hello”)
+```
+
+대표 에러:
+
+```text
+SyntaxError: invalid character '“' (U+201C)
+```
+
+근본 원인:
+
+- `“`와 `”`는 문서 편집기용 예쁜 따옴표다.
+- Python 문자열을 여닫는 문자는 ASCII 작은따옴표 `'` 또는 큰따옴표 `"`다.
+
+해결:
+
+```python
+print("Hello")
+```
+
+가르칠 문장:
+
+> 코드에서는 곧은 따옴표를 쓴다. 블로그나 문서에서 복사한 따옴표가 다르게 생겼으면 직접 다시 입력한다.
+
+### 3.8 backslash가 escape로 해석되는 경우
+
+잘못 이해하기 쉬운 코드:
+
+```python
+print("A\nB")
+```
+
+출력:
+
+```text
+A
+B
+```
+
+근본 원인:
+
+- `\n`은 두 글자처럼 보이지만 문자열 안에서는 줄바꿈 표시로 해석된다.
+- ASCII art에서 `\`를 출력하려면 `\\`가 필요할 수 있다.
+
+해결:
+
+```python
+print("A\\nB")
+```
+
+출력:
+
+```text
+A\nB
+```
+
+가르칠 문장:
+
+> `\`는 문자열 안에서 특별한 표시를 만들 때 쓰인다. `\` 자체를 보이고 싶으면 두 번 쓴다.
+
+### 3.9 `sep` 또는 `end`에 문자열이 아닌 값을 넣는 경우
+
+잘못된 코드:
+
+```python
+print("A", "B", sep=0)
+```
+
+대표 에러:
+
+```text
+TypeError: sep must be None or a string, not int
+```
+
+잘못된 코드:
+
+```python
+print("A", end=0)
+```
+
+대표 에러:
+
+```text
+TypeError: end must be None or a string, not int
+```
+
+근본 원인:
+
+- 공식 문서 기준 `sep`와 `end`는 문자열 또는 `None`이어야 한다.
+- `0`은 문자열 `"0"`이 아니라 정수 `0`이다.
+
+해결:
+
+```python
+print("A", "B", sep="0")
+print("A", end="0")
+```
+
+첫 단원에서는 필수 실수로 다루기보다 응용 예시에서 `sep`/`end`를 쓸 때만 짧게 언급한다.
+
+## 4. 첫 단원에 적합한 예시 코드 패턴 3개
+
+아래 예시는 외부 자료의 코드를 베끼지 않고, 이 프로젝트 단원용으로 직접 구성한 패턴이다.
+
+### 예시 1: 가장 단순한 첫 코드
+
+파일 후보: `hello.py`
+
+```python
+print("Hello, Python!")
 ```
 
 예상 출력:
@@ -621,45 +579,450 @@ python3 hello.py
 ```text
 Hello, Python!
 ```
-````
 
-주의: 위 예시는 구조 설명용이다. 실제 단원 콘텐츠는 구현/작성 요청이 있을 때 별도로 만든다.
+가르칠 포인트:
 
-## 5. v1.0 구현 전 의사결정 체크리스트
+- `print`
+- 괄호
+- 문자열
+- 실행하면 터미널에 결과가 나온다는 경험
 
-지금은 research.md만 작성했으므로, 다음 항목은 plan.md 또는 구현 요청 이후에 결정한다.
+주의:
 
-1. GitHub repository 이름
-   - `base: '/REPO/'`
-   - Codespaces badge URL
-   - GitHub Pages 최종 URL에 직접 영향
+- 너무 오래 설명하지 않는다.
+- 학생이 직접 실행해서 "내가 방금 프로그램을 실행했다"는 감각을 얻는 것이 핵심이다.
 
-2. `actions/upload-pages-artifact` 버전
-   - GitHub Pages docs 기준 보수 선택: `@v4`
-   - action repo 최신 태그 기준: `@v5`
-   - v1.0에서는 보수 선택이 더 어울림
+### 예시 2: 살짝 응용 - 여러 줄 자기소개
 
-3. devcontainer에서 `image` 생략 유지 여부
-   - 첫 Codespaces 생성 후 Python/Node/npm/gcc 확인
-   - 부족하면 feature 또는 image 추가를 plan에서 검토
+파일 후보: `greeting.py`
 
-4. VitePress sidebar 구성 방식
-   - Python, C를 top-level nav로 나눌지
-   - 단원 번호를 sidebar에 수동 배열로 관리할지
-   - v1.0 소규모 교재라 수동 sidebar가 가장 단순
+```python
+print("안녕하세요.")
+print("저는 Python을 배우기 시작했습니다.")
+print("오늘의 목표는 print()에 익숙해지는 것입니다.")
+```
 
-5. README Codespaces 운영 안내
-   - Stop Current Codespace
-   - Your codespaces에서 Delete
-   - 무료 한도 월 120 core-hours
-   - 결제수단 없으면 한도 초과 시 과금 대신 사용 제한
+예상 출력:
 
-## 6. 결론
+```text
+안녕하세요.
+저는 Python을 배우기 시작했습니다.
+오늘의 목표는 print()에 익숙해지는 것입니다.
+```
 
-현재 v1.0에 가장 맞는 방향은 다음과 같다.
+가르칠 포인트:
 
-- npm + VitePress `@next` + `docs` root + TypeScript config
-- GitHub Pages는 branch publish가 아니라 GitHub Actions workflow
-- VitePress build output은 기본값 `docs/.vitepress/dist`
-- devcontainer는 처음에 `image` 없이 default Codespaces image 사용
-- README와 단원에는 `codespaces.new/OWNER/REPO?quickstart=1` 배지 사용
+- 한국어 문자열 출력
+- `print()` 한 번마다 줄이 바뀜
+- 파일 안에 여러 줄의 코드가 위에서 아래로 실행됨
+
+주의:
+
+- 변수, 입력, 조건문은 아직 넣지 않는다.
+- "자기 이름을 직접 넣어 보라" 정도는 가능하지만 `input()`은 다음 단원으로 미룬다.
+
+### 예시 3: 조금 더 흥미로운 응용 - 콘솔 명찰 만들기
+
+파일 후보: `badge.py`
+
+```python
+print("=" * 24)
+print("나의 첫 Python 명찰")
+print("-" * 24)
+print("이름:", "홍길동")
+print("오늘 배운 것:", "print()")
+print("=" * 24)
+```
+
+예상 출력:
+
+```text
+========================
+나의 첫 Python 명찰
+------------------------
+이름: 홍길동
+오늘 배운 것: print()
+========================
+```
+
+가르칠 포인트:
+
+- `print("이름:", "홍길동")`처럼 쉼표로 여러 값을 출력하면 사이에 공백이 들어감
+- 문자열에 `* 숫자`를 붙이면 반복 출력할 수 있음
+- 학생이 "터미널에도 모양을 만들 수 있네"라고 느끼기 좋음
+
+주의:
+
+- `*` 연산은 본격 설명하지 않아도 된다.
+- "문자열을 여러 번 반복하는 짧은 마법" 정도로 소개하고, 자세한 연산은 뒤 단원으로 미룬다.
+
+## 5. 자가진단 문제로 적합한 유형
+
+### 5.1 출력 예측 문제
+
+목적:
+
+- 코드가 위에서 아래로 실행된다는 감각
+- `print()` 호출마다 줄바꿈이 생긴다는 감각
+- 쉼표 출력의 기본 공백
+
+문제 예시:
+
+```python
+print("Python")
+print("C")
+```
+
+질문:
+
+- 화면에는 몇 줄이 출력되는가?
+- 첫 줄과 둘째 줄에는 각각 무엇이 보이는가?
+
+문제 예시:
+
+```python
+print("Python", "C")
+```
+
+질문:
+
+- 출력이 한 줄인가, 두 줄인가?
+- 두 단어 사이에 무엇이 들어가는가?
+
+문제 예시:
+
+```python
+print("A\nB")
+```
+
+질문:
+
+- 출력은 실제로 몇 줄인가?
+- `\n`은 화면에 그대로 보이는가, 줄바꿈으로 바뀌는가?
+
+### 5.2 에러 찾기 문제
+
+목적:
+
+- 에러 메시지를 무서운 문장이 아니라 힌트로 읽게 만들기
+- `NameError`와 `SyntaxError`의 차이를 첫 감각으로 잡기
+
+문제 예시:
+
+```python
+Print("Hello")
+```
+
+정답 방향:
+
+- `Print`가 아니라 `print`.
+- Python은 대소문자를 구분한다.
+
+문제 예시:
+
+```python
+print(Hello)
+```
+
+정답 방향:
+
+- 글자 그대로 출력하려면 `"Hello"`처럼 따옴표가 필요하다.
+
+문제 예시:
+
+```python
+print("안녕하세요)
+```
+
+정답 방향:
+
+- 문자열을 닫는 큰따옴표가 없다.
+
+문제 예시:
+
+```python
+print("그가 말했다: "좋아!"")
+```
+
+정답 방향:
+
+- 안쪽 큰따옴표가 바깥 문자열을 끊어 버린다.
+- 바깥을 작은따옴표로 바꾸거나 안쪽 큰따옴표를 escape한다.
+
+### 5.3 빈칸 채우기 문제
+
+목적:
+
+- 학생이 직접 문법 조각을 채워 넣으며 구조를 기억하게 하기
+
+문제 예시:
+
+```python
+____("Hello, Python!")
+```
+
+정답:
+
+```python
+print("Hello, Python!")
+```
+
+문제 예시:
+
+```python
+print(____)
+```
+
+요구:
+
+- `안녕하세요`가 출력되도록 빈칸 채우기
+
+정답:
+
+```python
+print("안녕하세요")
+```
+
+문제 예시:
+
+```python
+print("Python", "C", sep=____)
+```
+
+요구:
+
+- `Python -> C`가 출력되도록 빈칸 채우기
+
+정답:
+
+```python
+print("Python", "C", sep=" -> ")
+```
+
+### 5.4 고르면 좋은 자가진단 구성
+
+첫 단원 끝에는 다음 조합이 좋다.
+
+1. 출력 예측 1문제: 여러 `print()` 줄
+2. 출력 예측 1문제: 쉼표 출력
+3. 에러 찾기 1문제: `Print` 또는 따옴표 누락
+4. 빈칸 채우기 1문제: `print("...")`
+5. 선택 문제 1개: `sep` 또는 `\n`
+
+최소 3문제 이상이라는 AGENTS.md 기준을 만족하되, 첫 단원이라 4~5문제가 적당하다.
+
+## 6. 학습 산출물과 미니 과제
+
+### 6.1 이 단원의 핵심 산출물
+
+학생이 Day 2 첫 단원 끝에서 만들 수 있어야 하는 파일:
+
+```text
+exercises/python/01-hello-world/
+├── hello.py
+├── greeting.py
+└── badge.py
+```
+
+단원 본문에는 정확히 다음 식으로 안내해야 한다.
+
+```bash
+cd exercises/python/01-hello-world
+python3 hello.py
+python3 greeting.py
+python3 badge.py
+```
+
+각 파일별 산출물:
+
+| 파일 | 목표 | 핵심 개념 |
+|---|---|---|
+| `hello.py` | 한 줄 출력 | `print("문자열")` |
+| `greeting.py` | 한국어 여러 줄 출력 | 여러 `print()` 호출과 줄바꿈 |
+| `badge.py` | 콘솔 명찰 출력 | 쉼표 출력, 문자열 반복, 간단한 모양 |
+
+### 6.2 Hello World 변형 미니 과제 후보
+
+미니 과제 1: 첫 문장 출력
+
+- 파일명: `hello.py`
+- 요구: `Hello, Python!`을 정확히 출력한다.
+- 실행: `python3 hello.py`
+- 예상 출력:
+
+```text
+Hello, Python!
+```
+
+미니 과제 2: 한국어 인사 3줄
+
+- 파일명: `greeting.py`
+- 요구: 한국어 문장 3줄을 각각 다른 `print()`로 출력한다.
+- 실행: `python3 greeting.py`
+- 예상 출력 예시:
+
+```text
+안녕하세요.
+저는 Python을 배우고 있습니다.
+오늘은 print()를 배웠습니다.
+```
+
+미니 과제 3: 따옴표 출력
+
+- 파일명: `quotes.py`
+- 요구: 큰따옴표가 포함된 문장과 작은따옴표가 포함된 문장을 각각 출력한다.
+- 실행: `python3 quotes.py`
+- 예상 출력 예시:
+
+```text
+그가 말했다: "좋아!"
+I'm learning Python.
+```
+
+미니 과제 4: 명찰 만들기
+
+- 파일명: `badge.py`
+- 요구: 위아래 선과 이름/오늘 배운 것을 출력한다.
+- 실행: `python3 badge.py`
+- 예상 출력 예시:
+
+```text
+========================
+나의 첫 Python 명찰
+------------------------
+이름: 홍길동
+오늘 배운 것: print()
+========================
+```
+
+### 6.3 백준 1000번대 입문 문제와의 매핑
+
+저작권 규칙상 문제 본문은 복사하지 않는다. 단원에는 링크와 "왜 연결되는지"만 적는다.
+
+현재 확인 메모:
+
+- 2026-05-18 조회 기준, 일부 BOJ 페이지는 서비스 준비/종료 안내 화면으로 보일 수 있다.
+- 따라서 단원에서는 백준을 필수 과제로 묶지 말고 "추가 연습 링크" 정도로 둔다.
+- 학생이 접속했을 때 페이지가 열리지 않으면 내부 미니 과제로 대체한다.
+
+| 문제 | 링크 | 이 단원과의 연결 | 첫 단원 적합도 |
+|---|---|---|---|
+| 2557 Hello World | https://www.acmicpc.net/problem/2557 | 단순 문자열 1줄 출력 | 매우 적합. 단, 1000번대는 아님 |
+| 10171 고양이 | https://www.acmicpc.net/problem/10171 | 여러 줄 출력, backslash escape | 적합하지만 escape 난도가 있음 |
+| 10172 개 | https://www.acmicpc.net/problem/10172 | 따옴표와 backslash가 섞인 ASCII art | 흥미롭지만 초보자에게 꽤 어려움 |
+| 1000 A+B | https://www.acmicpc.net/problem/1000 | 출력은 `print()`지만 입력/정수 변환이 필요 | 다음 단원 이후 권장 |
+| 1001 A-B | https://www.acmicpc.net/problem/1001 | 입력/정수 변환/연산/출력 | 다음 단원 이후 권장 |
+| 1008 A/B | https://www.acmicpc.net/problem/1008 | 입력/실수 또는 나눗셈 개념 필요 | 출력 단원만으로는 이름 |
+
+첫 단원 추천:
+
+1. 필수 산출물은 내부 미니 과제로 한다.
+2. 백준은 참고 링크로만 둔다.
+3. 2557은 "외부 사이트에서 가장 단순한 출력 문제"로 소개 가능하다.
+4. 10171/10172는 "따옴표와 backslash에 익숙해진 뒤 도전"으로 소개한다.
+5. 1000/1001/1008은 입력과 숫자 변환을 배운 뒤로 미룬다.
+
+## 7. 단원 본문 작성 시 권장 흐름
+
+### 7.1 도입
+
+핵심 메시지:
+
+- 프로그래밍을 처음 배울 때 첫 경험은 "내가 쓴 글자가 컴퓨터 화면에 나온다"이다.
+- `print()`는 앞으로 디버깅, 결과 확인, 문제 풀이에서 계속 쓰인다.
+
+도입 문장 방향:
+
+> 오늘은 Python에게 "이 문장을 화면에 보여 줘"라고 말하는 법을 배운다. 가장 작은 프로그램이지만, 앞으로 모든 실습의 출발점이다.
+
+### 7.2 핵심 개념 순서
+
+권장 순서:
+
+1. `print("Hello, Python!")` 실행
+2. `print`, 괄호, 문자열을 세 조각으로 분해
+3. 작은따옴표/큰따옴표
+4. 여러 `print()`와 자동 줄바꿈
+5. 한국어 출력
+6. 따옴표 안 따옴표
+7. 흔한 에러 읽기
+
+피해야 할 것:
+
+- 처음부터 `file`, `flush`, buffering 설명
+- 처음부터 f-string, 변수, `input()`
+- Unicode code point를 깊게 설명
+- Python 2와 Python 3 역사 설명을 길게 하는 것
+
+### 7.3 설명 톤
+
+학생은 완전 입문자이므로 전문 용어를 다음처럼 풀어 쓴다.
+
+| 용어 | 첫 단원 설명 |
+|---|---|
+| 함수 | Python이 이미 알고 있는 작은 기능 |
+| 호출 | 함수를 실행하는 것 |
+| 인자 | 함수에게 건네주는 값 |
+| 문자열 | 따옴표로 감싼 글자 데이터 |
+| 에러 | Python이 어디서 헷갈렸는지 알려 주는 메시지 |
+| SyntaxError | 문법 모양이 맞지 않는다는 뜻 |
+| NameError | Python이 그런 이름을 모른다는 뜻 |
+
+## 8. 첫 단원에서 다루지 말아야 할 것
+
+다음은 첫 단원에서 빼는 편이 좋다.
+
+- `input()`: 다음 단원 또는 변수 단원에서 다룬다.
+- 숫자 연산: 아주 짧은 맛보기 외에는 뒤로 미룬다.
+- f-string: 변수 전 설명이 필요하므로 뒤로 미룬다.
+- triple quote: 여러 줄 문자열보다 여러 `print()`가 먼저다.
+- raw string: backslash 문제가 실제로 나온 뒤 짧게 다룬다.
+- `file`, `flush`: 첫 단원에는 필요 없다.
+- encoding 선언 `# -*- coding: utf-8 -*-`: Python 3 기본 UTF-8 설명으로 충분하다.
+- 백준 문제 본문 복사: 링크만 둔다.
+
+## 9. 단원에 들어갈 참고 자료 후보
+
+단원 끝 참고 자료에는 아래 정도만 넣는 것이 적당하다.
+
+- Python 공식 문서: `print()`  
+  https://docs.python.org/3/library/functions.html#print
+- Python 공식 tutorial: 문자열 기초  
+  https://docs.python.org/3/tutorial/introduction.html
+- CS50 Python Lecture 0: Functions, Variables  
+  https://cs50.harvard.edu/python/notes/0/
+- 점프 투 파이썬: 사용자 입출력  
+  https://wikidocs.net/25
+
+Real Python은 내용이 길고 고급 옵션까지 많으므로, 단원 본문 참고 자료에는 선택적으로만 넣는다.
+
+## 10. 결론
+
+Python 첫 단원은 `print()`의 전체 기능을 설명하는 단원이 아니라, 학생이 "코드를 쓰고 실행해서 출력 결과를 확인하는 첫 성공"을 얻는 단원이어야 한다.
+
+필수 개념:
+
+- `print()`는 함수 호출이다.
+- 괄호 안에 출력할 값을 넣는다.
+- 글자는 따옴표로 감싼다.
+- Python 3/Codespaces에서는 한국어 문자열을 그대로 출력할 수 있다.
+- `print()`는 기본적으로 줄바꿈을 붙인다.
+- 따옴표 안 따옴표는 다른 따옴표를 쓰거나 escape한다.
+
+필수 실수:
+
+- 괄호 누락
+- 대소문자 오류
+- 따옴표 누락
+- 따옴표 미종료
+- 괄호 미종료
+- 내부 따옴표 충돌
+- 스마트 따옴표
+- backslash escape
+
+권장 산출물:
+
+- `hello.py`: 한 줄 출력
+- `greeting.py`: 한국어 여러 줄 출력
+- `badge.py`: 콘솔 명찰 출력
+
