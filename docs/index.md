@@ -1,4 +1,5 @@
 # Python & C 디지털 교재
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/khye16/coding-textbook?quickstart=1)
 
 Python과 C를 처음 배우는 학생을 위한 실습형 디지털 교재입니다.
 
