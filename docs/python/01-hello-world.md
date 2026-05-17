@@ -342,14 +342,52 @@ Codespaces가 열리면 아래 폴더로 이동하세요:
 cd exercises/python/01-hello-world
 ```
 
-### 문제 1. `hello.py`
+## Codespaces 기본 조작 (처음 한 번만)
 
-`hello.py` 파일을 열고 `Hello, Python!`이 출력되도록 완성하세요.
+각 미니 과제는 다음 흐름으로 풉니다:
+
+1. 파일 열기
+   - 왼쪽 Explorer(파일 아이콘)에서 `exercises/python/01-hello-world` 폴더 펼치기
+   - 풀고 싶은 파일(예: `01_hello.py`)을 더블클릭
+   - 또는 터미널에서: `code 01_hello.py`
+
+2. 코드 작성
+   - 에디터에서 starter 코드의 "여기에 코드를 작성하세요" 자리에 답 작성
+
+3. 저장
+   - `Ctrl + S` (또는 `Cmd + S`)
+   - 파일 탭의 점(●)이 사라지면 저장 완료
+
+4. 실행
+   - 터미널로 돌아가 `python3 01_hello.py` 실행
+
+5. 예상 출력과 비교
+   - 같으면 통과. 다르면 코드 다시 확인.
+
+## 초기화하기
+
+문제를 다시 처음부터 풀고 싶을 때는 터미널에서:
+
+```powershell
+git checkout exercises/python/01-hello-world/<파일명>
+```
+
+예시:
+
+```powershell
+git checkout exercises/python/01-hello-world/01_hello.py
+```
+
+이렇게 실행하면 해당 파일이 starter 상태로 돌아갑니다.
+
+### 문제 1. `01_hello.py`
+
+`01_hello.py` 파일을 열고 `Hello, Python!`이 출력되도록 완성하세요.
 
 실행 명령어:
 
 ```powershell
-python3 hello.py
+python3 01_hello.py
 ```
 
 예상 출력:
@@ -358,14 +396,14 @@ python3 hello.py
 Hello, Python!
 ```
 
-### 문제 2. `greeting.py`
+### 문제 2. `02_greeting.py`
 
-`greeting.py` 파일을 열고 한국어 문장 3줄이 출력되도록 완성하세요.
+`02_greeting.py` 파일을 열고 한국어 문장 3줄이 출력되도록 완성하세요.
 
 실행 명령어:
 
 ```powershell
-python3 greeting.py
+python3 02_greeting.py
 ```
 
 예상 출력:
@@ -376,14 +414,14 @@ python3 greeting.py
 오늘은 print()를 배웠습니다.
 ```
 
-### 문제 3. `badge.py`
+### 문제 3. `03_badge.py`
 
-`badge.py` 파일을 열고 `\n` 줄바꿈과 `\t` 탭을 사용해 명찰 모양을 완성하세요.
+`03_badge.py` 파일을 열고 `\n` 줄바꿈과 `\t` 탭을 사용해 명찰 모양을 완성하세요.
 
 실행 명령어:
 
 ```powershell
-python3 badge.py
+python3 03_badge.py
 ```
 
 예상 출력:
@@ -397,14 +435,14 @@ python3 badge.py
 
 탭 간격은 터미널 환경에 따라 조금 다르게 보일 수 있습니다.
 
-### 문제 4. `quotes.py`
+### 문제 4. `04_quotes.py`
 
-`quotes.py` 파일을 열고 따옴표가 포함된 문장이 출력되도록 완성하세요.
+`04_quotes.py` 파일을 열고 따옴표가 포함된 문장이 출력되도록 완성하세요.
 
 실행 명령어:
 
 ```powershell
-python3 quotes.py
+python3 04_quotes.py
 ```
 
 예상 출력:
@@ -415,16 +453,48 @@ I'm learning Python.
 백슬래시는 이렇게 씁니다: \
 ```
 
-### 추가 연습: 백준 문제
+## 추가 도전 문제
 
-문제 본문은 복사하지 않고 링크만 제공합니다. 백준 사이트에서 문제를 직접 확인하세요.
+본문에서 다룬 내용을 응용한 문제입니다. 풀고 강사에게 보여주세요.
 
-- 필수: [2557 Hello World](https://www.acmicpc.net/problem/2557)
-- 필수 또는 도전: [10718 We love kriii](https://www.acmicpc.net/problem/10718)
-- 도전: [10171 고양이](https://www.acmicpc.net/problem/10171)
-- 도전: [10172 개](https://www.acmicpc.net/problem/10172)
+### 도전 1: `05_pattern.py` — 패턴 출력
 
-`1000`, `1001`, `1008` 문제는 입력을 배운 뒤에 풀어도 늦지 않습니다.
+`exercises/python/01-hello-world/05_pattern.py` 파일에서 다음과 같은 출력을 만드세요:
+
+```text
+*
+**
+***
+****
+*****
+```
+
+힌트: 여러 줄 출력을 하나의 `print`로 만들거나 `print`를 여러 번 사용합니다.
+
+실행:
+
+```powershell
+python3 05_pattern.py
+```
+
+### 도전 2: `06_intro.py` — 포맷된 자기소개
+
+`exercises/python/01-hello-world/06_intro.py` 파일에서 다음과 같은 형식으로 자기소개를 출력하세요:
+
+```text
+이름:    홍길동
+나이:    20
+취미:    코딩
+```
+
+힌트: 탭(`\t`)으로 정렬, 줄바꿈(`\n`) 활용.
+이름/나이/취미는 본인 정보로 자유롭게 작성하세요.
+
+실행:
+
+```powershell
+python3 06_intro.py
+```
 
 ## 참고 자료
 
